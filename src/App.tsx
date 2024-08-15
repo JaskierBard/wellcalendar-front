@@ -1,12 +1,12 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
-import { DayViewCalendar } from './components/DayView/DayView';
+import { CalendarView } from './components/CalendarView/CalendarView';
 
 function App() {
   return (
     <div className="App">
-      <DayViewCalendar/>
+      <CalendarView/>
     </div>
   );
 }
