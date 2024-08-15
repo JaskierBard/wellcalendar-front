@@ -8,16 +8,23 @@ import {
   Scheduler,
   DayView,
   MonthView,
+  Toolbar,
   WeekView,
   Appointments,
+  TodayButton,
   AppointmentForm,
   AppointmentTooltip,
   ConfirmationDialog,
+  DateNavigator
 } from "@devexpress/dx-react-scheduler-material-ui";
 import { getCurrentDate } from "../common/getCurrentDate";
 import { useEffect, useState } from "react";
-import { getEvents } from "../../utils/fetchData";
-
+import {
+  addEvent,
+  deleteEvent,
+  getEvents,
+  updateEvent,
+} from "../../utils/fetchData";
 
 export const CalendarView = () => {
   const [data, setData] = useState<any>();
@@ -28,15 +35,28 @@ export const CalendarView = () => {
       setData(await getEvents());
     })();
   }, []);
-  
+
   const chooseFormat = (format: string) => {
     switch (format) {
       case "Day":
-        return <DayView startDayHour={9} endDayHour={14} />;
+        return <DayView startDayHour={9} endDayHour={16} />;
       case "Week":
-        return <WeekView startDayHour={9} endDayHour={14} />;
+        return <WeekView startDayHour={9} endDayHour={16} />;
       case "Month":
         return <MonthView />;
+    }
+  };
+
+  const addNewEvent = async (changes: any) => {
+    if (changes.added) {
+      await addEvent(changes.added);
+      setData(await getEvents());
+    } else if (changes.changed) {
+      await updateEvent(changes.changed);
+      setData(await getEvents());
+    } else if (changes.deleted) {
+      await deleteEvent(changes.deleted);
+      setData(await getEvents());
     }
   };
 
@@ -50,14 +70,15 @@ export const CalendarView = () => {
       <Paper>
         {data && (
           <Scheduler data={data} locale={"poland"}>
-            <ViewState currentDate={getCurrentDate()} />
-            <EditingState
-              onCommitChanges={(changes) => console.log(changes.added)}
-            />
+            <ViewState currentDate={getCurrentDate()}/>
+            <EditingState onCommitChanges={(changes) => addNewEvent(changes)} />
             <IntegratedEditing />
+            <Toolbar />
+            <DateNavigator />
             {chooseFormat(format)}
             <ConfirmationDialog />
             <Appointments />
+            <TodayButton/>
             <AppointmentTooltip showOpenButton showDeleteButton />
             <AppointmentForm />
           </Scheduler>
