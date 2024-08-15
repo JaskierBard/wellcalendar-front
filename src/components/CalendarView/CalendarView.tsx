@@ -5,6 +5,7 @@ import {
   IntegratedEditing,
 } from "@devexpress/dx-react-scheduler";
 import {
+  AllDayPanel,
   Scheduler,
   DayView,
   MonthView,
@@ -15,9 +16,9 @@ import {
   AppointmentForm,
   AppointmentTooltip,
   ConfirmationDialog,
-  DateNavigator
+  DateNavigator,
+  ViewSwitcher,
 } from "@devexpress/dx-react-scheduler-material-ui";
-import { getCurrentDate } from "../common/getCurrentDate";
 import { useEffect, useState } from "react";
 import {
   addEvent,
@@ -28,24 +29,12 @@ import {
 
 export const CalendarView = () => {
   const [data, setData] = useState<any>();
-  const [format, setFormat] = useState<string>("Day");
 
   useEffect(() => {
     (async () => {
       setData(await getEvents());
     })();
   }, []);
-
-  const chooseFormat = (format: string) => {
-    switch (format) {
-      case "Day":
-        return <DayView startDayHour={9} endDayHour={16} />;
-      case "Week":
-        return <WeekView startDayHour={9} endDayHour={16} />;
-      case "Month":
-        return <MonthView />;
-    }
-  };
 
   const addNewEvent = async (changes: any) => {
     if (changes.added) {
@@ -60,27 +49,33 @@ export const CalendarView = () => {
     }
   };
 
+  const translations = {
+    deleteButton: "usuń",
+    cancelButton: "anuluj",
+    confirmCancelMessage: "na pewno anulować?",
+    confirmDeleteMessage: "na pewno usunąć?",
+  };
+
   return (
     <div style={{ width: "900px", height: "800px" }}>
-      <div>
-        <button onClick={() => setFormat("Day")}>Day</button>
-        <button onClick={() => setFormat("Week")}>Week</button>
-        <button onClick={() => setFormat("Month")}>Month</button>
-      </div>
       <Paper>
         {data && (
-          <Scheduler data={data} locale={"poland"}>
-            <ViewState currentDate={getCurrentDate()}/>
+          <Scheduler data={data} locale={"pl"}>
+            <ViewState />
             <EditingState onCommitChanges={(changes) => addNewEvent(changes)} />
             <IntegratedEditing />
             <Toolbar />
+            <ViewSwitcher/>
             <DateNavigator />
-            {chooseFormat(format)}
-            <ConfirmationDialog />
+            <DayView startDayHour={9} endDayHour={16} name="Dzień"/>
+            <WeekView startDayHour={9} endDayHour={16} name="Tydzień"/>
+            <MonthView name="Miesiąc"/>
+            <ConfirmationDialog messages={translations} />
             <Appointments />
-            <TodayButton/>
+            <TodayButton messages={{ today: "Dziś" }} />
+            <AllDayPanel messages={{ allDay: "Cały dzień" }} />
             <AppointmentTooltip showOpenButton showDeleteButton />
-            <AppointmentForm />
+            <AppointmentForm messages={{titleLabel: 'nazwa', detailsLabel:'Szczegóły', notesLabel: 'notatki', moreInformationLabel:'Wiecej informacji'}}/>
           </Scheduler>
         )}
       </Paper>

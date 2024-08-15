@@ -1,6 +1,4 @@
 export const getEvents = async () => {
-  console.log('pobieranie danych')
-
   try {
     const response = await fetch(`http://localhost:3001/calendar/read`);
     if (!response.ok) {
@@ -54,12 +52,15 @@ export const updateEvent = async (data: any) => {
 
 export const deleteEvent = async (id: string) => {
   try {
-    const response = await fetch(`http://localhost:3001/calendar/delete/${id}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await fetch(
+      `http://localhost:3001/calendar/delete/${id}`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
